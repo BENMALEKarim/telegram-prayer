@@ -1,17 +1,17 @@
 import json
+import os
 from datetime import datetime
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
 
 # Replace with your bot token
-TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_TOKEN")
-chat_id = os.getenv("CHAT_ID")
+TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_TOKEN")
+chat_id = os.environ.get("CHAT_ID")
 
 # Global variable to hold the current todo list state (in a production app, use a database)
 current_todo_list = []
 
 def create_todo_list():
-    date = datetime.now().strftime("%Y-%m-%d")
     todo_list = [
         "Sobh",
         "Dohr",
@@ -20,7 +20,7 @@ def create_todo_list():
         "Icha"
     ]
     formatted_list = "\n".join(todo_list)
-    return f"Prière {date}:\n{formatted_list}", todo_list
+    return f"Prayers:\n{formatted_list}", todo_list
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await send_daily_todo_list(context)
@@ -42,9 +42,10 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_name = query.from_user.first_name
 
     now = datetime.now()
-    formatted_datetime = now.strftime("%Y-%m-%d %H:%M:%S")
+    date = now.strftime("%Y-%m-%d")
+    time = now.strftime("%H:%M")
     
-    response_text = f"{user_name} prayed {task_name} at {formatted_datetime}"
+    response_text = f"{user_name} prayed {task_name} {date} at {time}"
     
     await context.bot.send_message(chat_id=query.message.chat_id, text=response_text)
 
@@ -59,4 +60,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
